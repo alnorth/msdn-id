@@ -3,6 +3,10 @@ var http = require("http"),
     Server = mongo.Server,
     Db = mongo.Db;
 
+function idIsValid(shortId) {
+    return /^[a-zA-Z0-9]{8}$/.test(shortId);
+}
+
 function getIDFromMSDN(shortId, callback) {
     http.get({"host": "msdn.microsoft.com", port: 80, path: "/en-us/library/" + shortId}, function(res) {
         if(res.statusCode == 200) {
@@ -52,10 +56,17 @@ db.open(function(err, db) {
 
         db.collection("ids", function(err, ids) {
             if(!err) {
-                getIDWithDB("8hftfeyw", ids, function(canonical) {
-                    console.log(canonical);
+                var shortId = "8hftfeyw";
+
+                if(idIsValid(shortId)) {
+                    getIDWithDB(shortId, ids, function(canonical) {
+                        console.log(canonical);
+                        db.close();
+                    });
+                } else {
+                    console.log("Not a valid short id - /^[a-zA-Z0-9]{8}$/ expected")
                     db.close();
-                });
+                }
             } else {
                 console.log("MongoDB error", err);
             }
