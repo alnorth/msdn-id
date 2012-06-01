@@ -51,26 +51,29 @@ function getIDWithDB(shortId, ids, callback) {
 var server = new Server("localhost", 27017, {auto_reconnect: true});
 var db = new Db("msdn-ids", server);
 
+var defaultHeaders = {"Content-Type": "text/plain"}
+
 db.open(function(err, db) {
     if(!err) {
 
-        db.collection("ids", function(err, ids) {
-            if(!err) {
-                var shortId = "8hftfeyw";
+        http.createServer(function (req, res) {
+            var shortId = req.url.substring(1);
 
-                if(idIsValid(shortId)) {
-                    getIDWithDB(shortId, ids, function(canonical) {
-                        console.log(canonical);
-                        db.close();
-                    });
-                } else {
-                    console.log("Not a valid short id - /^[a-zA-Z0-9]{8}$/ expected")
-                    db.close();
-                }
+            if(idIsValid(shortId)) {
+                db.collection("ids", function(err, ids) {
+                    if(!err) {
+                        getIDWithDB(shortId, ids, function(canonical) {
+                            res.writeHead(200, defaultHeaders);
+                            res.end(canonical);
+                        });
+                    } else {
+                        console.log("MongoDB error", err);
+                    }
+                });
             } else {
-                console.log("MongoDB error", err);
+                console.log("Not a valid short id - /^[a-zA-Z0-9]{8}$/ expected")
             }
-        });
+        }).listen(9615);
 
     } else {
         console.log("MongoDB error", err);
