@@ -1,4 +1,7 @@
-var http = require("http");
+var http = require("http"),
+    mongo = require('mongodb'),
+    Server = mongo.Server,
+    Db = mongo.Db;
 
 function getIDFromMSDN(shortId, callback) {
     http.get({"host": "msdn.microsoft.com", port: 80, path: "/en-us/library/" + shortId}, function(res) {
@@ -14,7 +17,7 @@ function getIDFromMSDN(shortId, callback) {
             } catch (err) {
                 console.log(err);
                 callback(null);
-            }            
+            }
         });
     }).on('error', function(e) {
         console.log("Got error: " + e.message);
@@ -22,6 +25,26 @@ function getIDFromMSDN(shortId, callback) {
     });
 }
 
-getIDFromMSDN("ms149618", function(canonical) {
-    console.log(canonical);
+function getIDWithDB(shortId, db, callback) {
+
+    getIDFromMSDN(shortId, function(canonical) {
+        callback(canonical);
+    });
+}
+
+var server = new Server("localhost", 27017, {auto_reconnect: true});
+var db = new Db("msdn-ids", server);
+
+db.open(function(err, db) {
+    if(!err) {
+
+        getIDWithDB("ms149618", db, function(canonical) {
+            console.log(canonical);
+        });
+
+        db.close();
+
+    } else {
+        console.log("MongoDB error", err);
+    }
 });
