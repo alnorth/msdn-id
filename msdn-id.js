@@ -1,5 +1,6 @@
 var fs = require("fs"),
     http = require("http"),
+    url = require("url"),
     mongo = require('mongodb'),
     Server = mongo.Server,
     Db = mongo.Db;
@@ -49,10 +50,21 @@ function getIDWithDB(shortId, ids, callback) {
     });
 }
 
+function returnCanonical(canonical, req, res) {
+    var urlParts = url.parse(req.url, true),
+        requestCode = canonical ? 200 : 404;
+
+    if(urlParts.query.callback) {
+        res.writeHead(requestCode, {"Content-Type": "text/javascript"});
+        res.end(urlParts.query.callback + "(" + JSON.stringify(canonical) + ");");
+    } else {
+        res.writeHead(requestCode, {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"});
+        res.end(canonical);
+    }
+}
+
 var server = new Server("localhost", 27017, {auto_reconnect: true});
 var db = new Db("msdn-ids", server);
-
-var defaultHeaders = {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"};
 
 db.open(function(err, db) {
     if(!err) {
@@ -65,23 +77,24 @@ db.open(function(err, db) {
                     res.end();
                 });
             } else if(req.url === "/favicon.ico") {
-                res.writeHead(404, defaultHeaders);
+                res.writeHead(404);
                 res.end();
             } else {
-                var shortId = req.url.substring(1);
+                var shortId = url.parse(req.url, true).pathname.substring(1);
 
                 if(idIsValid(shortId)) {
                     db.collection("ids", function(err, ids) {
                         if(!err) {
                             getIDWithDB(shortId, ids, function(canonical) {
-                                res.writeHead(200, defaultHeaders);
-                                res.end(canonical);
+                                returnCanonical(canonical, req, res);
                             });
                         } else {
+                            returnCanonical(null, req, res);
                             console.log("MongoDB error", err);
                         }
                     });
                 } else {
+                    returnCanonical(null, req, res);
                     console.log("Not a valid short id - /^[a-zA-Z0-9]{8}$/ expected")
                 }
             }
