@@ -1,4 +1,5 @@
-var http = require("http"),
+var fs = require("fs"),
+    http = require("http"),
     mongo = require('mongodb'),
     Server = mongo.Server,
     Db = mongo.Db;
@@ -57,22 +58,31 @@ db.open(function(err, db) {
     if(!err) {
 
         http.createServer(function (req, res) {
-            var shortId = req.url.substring(1);
-
-            if(idIsValid(shortId)) {
-                db.collection("ids", function(err, ids) {
-                    if(!err) {
-                        getIDWithDB(shortId, ids, function(canonical) {
-                            res.writeHead(200, defaultHeaders);
-                            res.end(canonical);
-                        });
-                    } else {
-                        console.log("MongoDB error", err);
-                    }
+            if(req.url === "/") {
+                fs.readFile("index.html", "binary", function(err, file) {
+                    res.writeHead(200, {"Content-Type": "text/html"});
+                    res.write(file, "binary");
+                    res.end();
                 });
             } else {
-                console.log("Not a valid short id - /^[a-zA-Z0-9]{8}$/ expected")
+                var shortId = req.url.substring(1);
+
+                if(idIsValid(shortId)) {
+                    db.collection("ids", function(err, ids) {
+                        if(!err) {
+                            getIDWithDB(shortId, ids, function(canonical) {
+                                res.writeHead(200, defaultHeaders);
+                                res.end(canonical);
+                            });
+                        } else {
+                            console.log("MongoDB error", err);
+                        }
+                    });
+                } else {
+                    console.log("Not a valid short id - /^[a-zA-Z0-9]{8}$/ expected")
+                }
             }
+
         }).listen(9615);
 
     } else {
