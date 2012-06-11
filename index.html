@@ -1,1 +1,61 @@
-No
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>MSDN IDs</title>
+    <meta name="description" content="">
+
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="http://software.alnorth.com/bootstrap2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="http://software.alnorth.com/bootstrap2/css/bootstrap-responsive.min.css">
+    <style type="text/css">
+        h1 {
+            margin-top: 1em;
+        }
+
+        h1, h3 {
+            margin-bottom: 0.5em;
+        }
+
+        .footer {
+            margin-top: 45px;
+            padding: 35px 0 36px;
+            border-top: 1px solid #E5E5E5;
+        }
+    </style>
+</head>
+<body>
+    <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+    <div class="container">
+        <h1>MSDN IDs</h1>
+        <div class="row">
+            <div class="span6">
+                <p>This web service provides mappings from the short IDs used on the MSDN website and the canonical names of classes and methods.</p>
+                <p>To look up an ID simply add it to the end of the services URL. For example, to look up the short ID "zba0x2tx" you would call <a href="http://msdnids.alnorth.com/zba0x2tx">http://msdnids.alnorth.com/zba0x2tx</a>.</p>
+                <p>By default the value will be returned as plain text. If the service can't find a canonical name for the ID then it will return an empty response.</p>
+            </div>
+            <div class="span6">
+                <h3>Cross-domain</h3>
+                <p>CORS requests are supported using the <code>Access-Control-Allow-Origin: *</code> header. If you need to use it in browsers that don't support CORS then JSONP is also supported, you just need to add a <code>callback</code> parameter on the query string.</p>
+            </div>
+        </div>
+
+        <footer class="footer">
+            &copy; 2012 <a href="http://www.twitter.com/alasdairnorth">@alasdairnorth</a> | <a href="http://software.alnorth.com/">other projects</a>
+        </footer>
+    </div>
+
+    <!--
+    <script>
+        var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
+    -->
+</body>
+</html>
