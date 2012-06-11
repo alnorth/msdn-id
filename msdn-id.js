@@ -66,6 +66,8 @@ function returnCanonical(canonical, req, res) {
 var server = new Server("localhost", 27017, {auto_reconnect: true});
 var db = new Db("msdn-ids", server);
 
+var port = process.argv[2] || 8000;
+
 db.open(function(err, db) {
     if(!err) {
 
@@ -99,7 +101,7 @@ db.open(function(err, db) {
                 }
             }
 
-        }).listen(9615);
+        }).listen(port);
 
     } else {
         console.log("MongoDB error", err);
