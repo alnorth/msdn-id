@@ -64,6 +64,9 @@ db.open(function(err, db) {
                     res.write(file, "binary");
                     res.end();
                 });
+            } else if(req.url === "/favicon.ico") {
+                res.writeHead(404, defaultHeaders);
+                res.end();
             } else {
                 var shortId = req.url.substring(1);
 
