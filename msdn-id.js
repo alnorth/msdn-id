@@ -52,7 +52,7 @@ function getIDWithDB(shortId, ids, callback) {
 var server = new Server("localhost", 27017, {auto_reconnect: true});
 var db = new Db("msdn-ids", server);
 
-var defaultHeaders = {"Content-Type": "text/plain"}
+var defaultHeaders = {"Content-Type": "text/plain", "Access-Control-Allow-Origin": "*"};
 
 db.open(function(err, db) {
     if(!err) {
