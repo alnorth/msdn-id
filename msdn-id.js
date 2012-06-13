@@ -11,6 +11,7 @@ function idIsValid(shortId) {
 }
 
 function getIDFromMSDN(shortId, callback) {
+    console.log(shortId);
     http.get({"host": "msdn.microsoft.com", port: 80, path: "/en-us/library/" + shortId}, function(res) {
         if(res.statusCode == 200) {
             var body = "";
@@ -62,15 +63,11 @@ function getIDWithDB(shortId, ids, callback) {
                 if(canonical === shortId && parentShortId) {
                     // Go up the tree in search of a canonical ID.
                     getIDWithDB(parentShortId, ids, function(canonical) {
-                        if(canonical) {
-                            ids.insert({"short_id": shortId, "canonical": canonical});
-                        }
+                        ids.insert({"short_id": shortId, "canonical": canonical});
                         callback(canonical);
                     });
                 } else {
-                    if(canonical) {
-                        ids.insert({"short_id": shortId, "canonical": canonical});
-                    }
+                    ids.insert({"short_id": shortId, "canonical": canonical});
                     callback(canonical);
                 }
             });
