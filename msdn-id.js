@@ -26,9 +26,11 @@ function getIDFromMSDN(shortId, callback) {
                     if(canonical === shortId) {
                         // This page only has a short ID to identify it. We will recurse up the tree to see if a page further up has a canonical ID.
                         var parentPath = $(body).find(".nav_div_currentroot:last").children("a").attr("href");
-                        parentId = parentPath.substring(parentPath.lastIndexOf("/") + 1);
+                        if(parentPath) {
+                            parentId = parentPath.substring(parentPath.lastIndexOf("/") + 1);
+                        }
                     }
-                    callback(matches[1], parentId);
+                    callback(canonical, parentId);
                 } catch (err) {
                     console.log(err);
                     callback(null, null);
