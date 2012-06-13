@@ -103,7 +103,7 @@ db.open(function(err, db) {
                     db.collection("ids", function(err, ids) {
                         if(!err) {
                             getIDWithDB(shortId, ids, function(canonical) {
-                                returnCanonical(canonical === shortId ? null : canonical, req, res);
+                                returnCanonical(idIsValid(canonical) ? null : canonical, req, res);
                             });
                         } else {
                             returnCanonical(null, req, res);
