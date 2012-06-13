@@ -2,6 +2,7 @@
 	"name": "msdn-ids",
 	"version": "0.0.1",
 	"dependencies": {
+		"jquery": "1.7.2",
 		"mongodb": "1.0.2"
 	}
 }

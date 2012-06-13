@@ -1,7 +1,8 @@
 var fs = require("fs"),
     http = require("http"),
     url = require("url"),
-    mongo = require('mongodb'),
+    mongo = require("mongodb"),
+    $ = require("jquery"),
     Server = mongo.Server,
     Db = mongo.Db;
 
@@ -18,20 +19,27 @@ function getIDFromMSDN(shortId, callback) {
                 body += chunk;
             });
             res.on('end', function (chunk) {
-                matches = body.match(/<link rel="canonical" href="http:\/\/msdn\.microsoft\.com\/en-us\/library\/([a-zA-Z0-9.]+)\.aspx" \/>/);
+                matches = body.match(/<link rel="canonical" href="http:\/\/msdn\.microsoft\.com\/en-us\/library\/([a-zA-Z0-9.]+)(?:_[a-z]+)?\.aspx" \/>/);
                 try {
-                    callback(matches[1]);
+                    var canonical = matches[1],
+                        parentId;
+                    if(canonical === shortId) {
+                        // This page only has a short ID to identify it. We will recurse up the tree to see if a page further up has a canonical ID.
+                        var parentPath = $(body).find(".nav_div_currentroot:last").children("a").attr("href");
+                        parentId = parentPath.substring(parentPath.lastIndexOf("/") + 1);
+                    }
+                    callback(matches[1], parentId);
                 } catch (err) {
                     console.log(err);
-                    callback(null);
+                    callback(null, null);
                 }
             });
         } else {
-            callback(null);
+            callback(null, null);
         }
     }).on('error', function(e) {
         console.log("Got error: " + e.message);
-        callback(null);
+        callback(null, null);
     });
 }
 
@@ -40,11 +48,16 @@ function getIDWithDB(shortId, ids, callback) {
         if(item) {
             callback(item.canonical);
         } else {
-            getIDFromMSDN(shortId, function(canonical) {
+            getIDFromMSDN(shortId, function(canonical, parentShortId) {
                 if(canonical) {
                     ids.insert({"short_id": shortId, "canonical": canonical});
                 }
-                callback(canonical);
+                if(canonical === shortId && parentShortId) {
+                    // Go up the tree in search of a canonical ID.
+                    getIDWithDB(parentShortId, ids, callback);
+                } else {
+                    callback(canonical);
+                }
             });
         }
     });
