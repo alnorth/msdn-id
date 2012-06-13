@@ -20,12 +20,7 @@ function getIDFromMSDN(shortId, callback) {
             res.on('end', function (chunk) {
                 matches = body.match(/<link rel="canonical" href="http:\/\/msdn\.microsoft\.com\/en-us\/library\/([a-zA-Z0-9.]+)\.aspx" \/>/);
                 try {
-                    var canonical = matches[1];
-                    if(shortId !== canonical) {
-                        callback(canonical);
-                    } else {
-                        callback(null);
-                    }
+                    callback(matches[1]);
                 } catch (err) {
                     console.log(err);
                     callback(null);
@@ -49,7 +44,7 @@ function getIDWithDB(shortId, ids, callback) {
                 if(canonical) {
                     ids.insert({"short_id": shortId, "canonical": canonical});
                 }
-                callback(canonical);
+                callback(canonical === shortId ? null : canonical);
             });
         }
     });
