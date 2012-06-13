@@ -73,7 +73,7 @@ db.open(function(err, db) {
 
         http.createServer(function (req, res) {
             if(req.url === "/") {
-                fs.readFile("index.html", "binary", function(err, file) {
+                fs.readFile(__dirname + "/index.html", "binary", function(err, file) {
                     res.writeHead(200, {"Content-Type": "text/html"});
                     res.write(file, "binary");
                     res.end();
