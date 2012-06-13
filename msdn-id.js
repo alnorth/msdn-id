@@ -44,7 +44,7 @@ function getIDWithDB(shortId, ids, callback) {
                 if(canonical) {
                     ids.insert({"short_id": shortId, "canonical": canonical});
                 }
-                callback(canonical === shortId ? null : canonical);
+                callback(canonical);
             });
         }
     });
@@ -88,7 +88,7 @@ db.open(function(err, db) {
                     db.collection("ids", function(err, ids) {
                         if(!err) {
                             getIDWithDB(shortId, ids, function(canonical) {
-                                returnCanonical(canonical, req, res);
+                                returnCanonical(canonical === shortId ? null : canonical, req, res);
                             });
                         } else {
                             returnCanonical(null, req, res);
