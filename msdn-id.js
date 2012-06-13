@@ -59,9 +59,6 @@ function getIDWithDB(shortId, ids, callback) {
             callback(item.canonical);
         } else {
             getIDFromMSDN(shortId, function(canonical, parentShortId) {
-                if(canonical) {
-                    ids.insert({"short_id": shortId, "canonical": canonical});
-                }
                 if(canonical === shortId && parentShortId) {
                     // Go up the tree in search of a canonical ID.
                     getIDWithDB(parentShortId, ids, callback);
@@ -70,6 +67,15 @@ function getIDWithDB(shortId, ids, callback) {
                 }
             });
         }
+    });
+}
+
+function getID(shortId, ids, callback) {
+    getIDWithDB(shortId, ids, function(canonical) {
+        if(canonical) {
+            ids.insert({"short_id": shortId, "canonical": canonical});
+        }
+        callback(canonical);
     });
 }
 
@@ -110,7 +116,7 @@ db.open(function(err, db) {
                 if(idIsValid(shortId)) {
                     db.collection("ids", function(err, ids) {
                         if(!err) {
-                            getIDWithDB(shortId, ids, function(canonical) {
+                            getID(shortId, ids, function(canonical) {
                                 returnCanonical(idIsValid(canonical) ? null : canonical, req, res);
                             });
                         } else {
