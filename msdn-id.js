@@ -19,18 +19,26 @@ function getIDFromMSDN(shortId, callback) {
                 body += chunk;
             });
             res.on('end', function (chunk) {
-                matches = body.match(/<link rel="canonical" href="http:\/\/msdn\.microsoft\.com\/en-us\/library\/([a-zA-Z0-9.]+)(?:_[a-z]+)?\.aspx" \/>/);
+                matches = body.match(/<link rel="canonical" href="http:\/\/msdn\.microsoft\.com\/en-us\/library\/([a-zA-Z0-9.]+)(?:_[a-z]+)?(?:\(v=vs\.\d+\))?\.aspx" \/>/);
                 try {
-                    var canonical = matches[1],
-                        parentId;
-                    if(canonical === shortId) {
-                        // This page only has a short ID to identify it. We will recurse up the tree to see if a page further up has a canonical ID.
-                        var parentPath = $(body).find(".nav_div_currentroot:last").children("a").attr("href");
-                        if(parentPath) {
-                            parentId = parentPath.substring(parentPath.lastIndexOf("/") + 1);
+                    if(matches) {
+                        var canonical = matches[1],
+                            parentId;
+                        if(canonical === shortId) {
+                            // This page only has a short ID to identify it. We will recurse up the tree to see if a page further up has a canonical ID.
+                            var parentPath = $(body).find(".nav_div_currentroot:last").children("a").attr("href");
+                            if(parentPath) {
+                                var parentMatches = parentPath.match(/^\/en-us\/library\/([a-zA-Z0-9.]+)(?:_[a-z]+)?(?:\(v=vs\.\d+\))?/);
+                                if(parentMatches) {
+                                    parentId = parentMatches[1];
+                                }
+                            }
                         }
+                        callback(canonical, parentId);
+                    } else {
+                        console.log("No canonical URL found for " + shortId);
+                        callback(null, null);
                     }
-                    callback(canonical, parentId);
                 } catch (err) {
                     console.log(err);
                     callback(null, null);
