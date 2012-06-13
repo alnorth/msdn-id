@@ -20,7 +20,12 @@ function getIDFromMSDN(shortId, callback) {
             res.on('end', function (chunk) {
                 matches = body.match(/<link rel="canonical" href="http:\/\/msdn\.microsoft\.com\/en-us\/library\/([a-zA-Z0-9.]+)\.aspx" \/>/);
                 try {
-                    callback(matches[1]);
+                    var canonical = matches[1];
+                    if(shortId !== canonical) {
+                        callback(canonical);
+                    } else {
+                        callback(null);
+                    }
                 } catch (err) {
                     console.log(err);
                     callback(null);
