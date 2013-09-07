@@ -2,9 +2,10 @@ var fs = require("fs"),
     http = require("http"),
     url = require("url"),
     mongo = require("mongodb"),
-    $ = require("jquery"),
-    Server = mongo.Server,
-    Db = mongo.Db;
+    $ = require("jquery");
+
+var mongoUri = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/msdn-ids';
+var port = process.env.PORT || 5000;
 
 function idIsValid(shortId) {
     return /^[a-zA-Z0-9]{8}$/.test(shortId);
@@ -88,12 +89,7 @@ function returnCanonical(canonical, req, res) {
     }
 }
 
-var server = new Server("localhost", 27017, {auto_reconnect: true});
-var db = new Db("msdn-ids", server);
-
-var port = process.argv[2] || 8000;
-
-db.open(function(err, db) {
+mongo.Db.connect(mongoUri, function(err, db) {
     if(!err) {
 
         http.createServer(function (req, res) {
